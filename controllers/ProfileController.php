@@ -15,13 +15,49 @@ class ProfileController extends Controller
 	public function actionProfile()
 	{
 		$model = $this->loadUser();
+		$profile = $model->profile;
+		
+		//$f = $profile->hasFieldsForCompletion();
+		if($profile->hasFieldsForCompletion()) {
+			$this->redirect(array('/user/profile/complete'));
+		}
 	    $this->render('profile',array(
 	    	'model'=>$model,
 			'profile'=>$model->profile,
 	    ));
 	}
 
-
+	/**
+	 * Controller for fields that need to be entered *after* registration
+	 */
+	public function actionComplete()
+	{
+		Profile::$mode = 'com';
+		$model = $this->loadUser();
+		$profile = $model->profile;
+		// ajax validator
+		if(isset($_POST['ajax']) && $_POST['ajax']==='complete-form')
+		{
+			echo UActiveForm::validate(array($model,$profile));
+			Yii::app()->end();
+		}
+		if (!Yii::app()->user->id) {
+			$this->redirect(Yii::app()->controller->module->loginUrl);
+		} else {
+			if(isset($_POST['Profile'])) {
+				$profile->attributes=$_POST['Profile'];
+				if($profile->validate()) {
+					$profile->save();
+					$this->redirect(array('/user/profile'));
+				}
+			}
+		}
+		$this->render('complete',array(
+				'model'=>$model,
+				'profile'=>$profile,
+		));
+	}
+	
 	/**
 	 * Updates a particular model.
 	 * If update is successful, the browser will be redirected to the 'view' page.

@@ -5,9 +5,9 @@ class Profile extends UActiveRecord
 	/**
 	 * The followings are the available columns in table 'profiles':
 	 * @var integer $user_id
-	 * @var boolean $regMode
+	 * @var string $mode reg|com
 	 */
-	public static $regMode = false;
+	public static $mode = null;
 	
 	private static $_model;
 	private static $_modelReg;
@@ -48,6 +48,8 @@ class Profile extends UActiveRecord
 				$field_rule = array();
 				if ($field->required==ProfileField::REQUIRED_YES_NOT_SHOW_REG||$field->required==ProfileField::REQUIRED_YES_SHOW_REG)
 					array_push($required,$field->varname);
+				if (self::$mode=='com'&&$field->required==ProfileField::REQUIRED_YES_AFTER_REG)
+					array_push($float,$field->varname);
 				if ($field->field_type=='FLOAT')
 					array_push($float,$field->varname);
 				if ($field->field_type=='DECIMAL')
@@ -174,9 +176,13 @@ class Profile extends UActiveRecord
 	}
 	
 	public static function getFields() {
-		if (self::$regMode) {
+		if (self::$mode == 'reg') {
 			if (!self::$_modelReg)
 				self::$_modelReg=ProfileField::model()->forRegistration()->findAll();
+			return self::$_modelReg;
+		} else if (self::$mode == 'com') {
+			if (!self::$_modelReg)
+				self::$_modelReg=ProfileField::model()->forComplete()->findAll();
 			return self::$_modelReg;
 		} else {
 			if (!self::$_model)
@@ -184,9 +190,30 @@ class Profile extends UActiveRecord
 			return self::$_model;
 		}
 	}
+	
+	public function hasFieldsForCompletion() {
+		$ret = false;
+		if ($f=ProfileField::model()->forComplete()->findAll()) {
+			foreach($f as $fld) {
+				$vn = $fld->varname;
+				//@TODO: finish all conditions
+				switch ($fld->field_type) {
+					case 'INTEGER':
+						if(!$this->$vn > 0 )
+							$ret = true; 
+					break;
+					default:
+						if(!$this->$vn != '' )
+							$ret = true;
+					break;
+				}
+			}
+		}
+		return $ret;
+	}
 
     public function afterSave() {
-        if (get_class(Yii::app())=='CWebApplication'&&Profile::$regMode==false) {
+        if (get_class(Yii::app())=='CWebApplication'&&Profile::$mode == 'reg') {
             Yii::app()->user->updateSession();
         }
         return parent::afterSave();

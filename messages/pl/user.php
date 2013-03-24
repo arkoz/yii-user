@@ -68,6 +68,7 @@ return array(
         'Yes' => 'Tak',
         'Yes and show on registration form' => 'Tak. Przejdź do formularza rejestracyjnego',
         'No, but show on registration form' => 'Nie, ale pokaż formularz rejestracyjny',
+		'Yes, but show after registration form' => 'Tak, ale pokaż po rejestracji',
         'Not active' => 'Nieaktywne',
         'Active' => 'Aktywne',
         'Banned' => 'Zbanowani',

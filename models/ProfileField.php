@@ -11,6 +11,7 @@ class ProfileField extends CActiveRecord
 	const REQUIRED_YES_SHOW_REG = 1;
 	const REQUIRED_NO_SHOW_REG = 2;
 	const REQUIRED_YES_NOT_SHOW_REG = 3;
+	const REQUIRED_YES_AFTER_REG = 4;
 	
 	/**
 	 * The followings are the available columns in table 'profiles_fields':
@@ -122,6 +123,10 @@ class ProfileField extends CActiveRecord
                 'condition'=>'required='.self::REQUIRED_NO_SHOW_REG.' OR required='.self::REQUIRED_YES_SHOW_REG,
                 'order'=>'position',
             ),
+        	'forComplete'=>array(
+        		'condition'=>'required='.self::REQUIRED_YES_AFTER_REG,
+        		'order'=>'position',
+        	),
             'sort'=>array(
                 'order'=>'position',
             ),
@@ -192,6 +197,7 @@ class ProfileField extends CActiveRecord
 				self::REQUIRED_NO_SHOW_REG => UserModule::t('No, but show on registration form'),
 				self::REQUIRED_YES_SHOW_REG => UserModule::t('Yes and show on registration form'),
 				self::REQUIRED_YES_NOT_SHOW_REG => UserModule::t('Yes'),
+				self::REQUIRED_YES_AFTER_REG => UserModule::t('Yes, but show after registration form'),
 			),
 			'visible' => array(
 				self::VISIBLE_ALL => UserModule::t('For all'),
